@@ -56,7 +56,7 @@ check_deps () {
         packages="$packages $x11vnc"
     fi
 
-    if [[ $packages ]]; then
+    if [ ! -z "$packages" ]; then
         echo "Need sudo password for installing the following packages:"
         echo ">> $packages"
         echo -n "Password: "
@@ -86,8 +86,10 @@ on_exit () {
     echo "VPN removed!"
 }
 
-if [[ $1 == "make" ]]; then
-    cat $0 $2 > new_launch_assistance.sh
+if [ "$1" = "make" ]; then
+    new_script="new_launch_assistance.sh"
+    cat $0 $2 > $new_script
+    chmod +x $new_script
     exit 0
 else
     trap on_exit EXIT
