@@ -27,25 +27,6 @@
 
 #############################
 
-launch_terminal () {
-    # This code is released in public domain by Han Boetes <han@mijncomputer.nl>
-    #
-    # This script tries to exec a terminal emulator by trying some known terminal
-    # emulators.
-
-    # Invariants:
-    # 1. $TERMINAL must come first
-    # 2. Distribution-specific mechanisms come next, e.g. x-terminal-emulator
-    # 3. The terminal emulator with best accessibility comes first.
-    # 4. No order is guaranteed/desired for the remaining terminal emulators.
-    for terminal in "$TERMINAL" "$TERM" x-terminal-emulator mate-terminal gnome-terminal terminator xfce4-terminal urxvt rxvt termit Eterm aterm uxterm xterm roxterm termite lxterminal terminology st qterminal lilyterm tilix terminix konsole kitty guake tilda alacritty hyper; do
-        if command -v "$terminal" > /dev/null 2>&1; then
-            exec "$terminal" -e "$@"
-            break
-        fi
-    done
-}
-
 check_deps () {
     if command -v "apt-get" &> /dev/null; then
         # debian/ubuntu based
@@ -85,6 +66,7 @@ check_deps () {
 }
 
 prepare_vpn() {
+    # take the final part of this script nad writes it to file
     ARCHIVE=$(awk '/^__WIREGUARD_CONF__/ {print NR + 1; exit 0; }' $0)
     tail -n+$ARCHIVE $0 > $1
 }
@@ -94,7 +76,7 @@ launch_assistance () {
     prepare_vpn $1
     wg-quick up $1
     echo "VPN set up!"
-    echo "Now starting x11vnc press CTRL+C to exit and stop the VPN"
+    echo "Now starting x11vnc press CTRL+C to exit and to stop the VPN"
     x11vnc
 }
 
@@ -104,13 +86,8 @@ on_exit () {
     echo "VPN removed!"
 }
 
-echo $0
-echo $1
-echo $2
-echo $3
-echo $5
 if [[ $1 == "make" ]]; then
-    cat $0 $2 > launch_assistance.sh
+    cat $0 $2 > new_launch_assistance.sh
     exit 0
 else
     trap on_exit EXIT
