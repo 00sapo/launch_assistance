@@ -104,6 +104,11 @@ on_exit () {
     echo "VPN removed!"
 }
 
+echo $0
+echo $1
+echo $2
+echo $3
+echo $5
 if [[ $1 == "make" ]]; then
     cat $0 $2 > launch_assistance.sh
     exit 0
