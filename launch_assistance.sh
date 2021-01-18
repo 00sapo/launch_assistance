@@ -17,16 +17,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #########################################################################
 
-########### HOW TO ##########
-
-#. create a wireguard configuration for your assisted machine
-#. execute `launch_assistance.sh make <path to conf>
-#. give the newly generated `launch_assistance.sh` to your assisted machine
-#. when assisting, tell the assisted machine to execute  this script
-#. enter the vpn and connect via vnc to the assisted machine
-
-#############################
-
 check_deps () {
     if command -v "apt-get" &> /dev/null; then
         # debian/ubuntu based
@@ -67,7 +57,7 @@ check_deps () {
 
 prepare_vpn() {
     # take the final part of this script nad writes it to file
-    ARCHIVE=$(awk '/^__WIREGUARD_CONF__/ {print NR + 1; exit 0; }' $0)
+    ARCHIVE=$(awk '/^#__WIREGUARD_CONF__#/ {print NR + 1; exit 0; }' $0)
     tail -n+$ARCHIVE $0 > $1
 }
 
@@ -83,22 +73,16 @@ launch_assistance () {
 on_exit () {
     wg-quick down $1
     rm $1
+    rm $0
     echo "VPN removed!"
 }
 
-if [ "$1" = "make" ]; then
-    new_script="new_launch_assistance.sh"
-    cat $0 $2 > $new_script
-    chmod +x $new_script
-    exit 0
-else
-    trap on_exit EXIT
-    trap on_exit SIGINT
-    check_deps
-    vpn_conf="./myvpn.conf"
-    launch_assistance $vpn_conf
-    on_exit $vpn_conf
-    exit 0
-fi
+trap on_exit EXIT
+trap on_exit SIGINT
+check_deps
+vpn_conf="./myvpn.conf"
+launch_assistance $vpn_conf
+on_exit $vpn_conf
+exit 0
 
-__WIREGUARD_CONF__
+#__WIREGUARD_CONF__#

@@ -1,0 +1,11 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Name=Launch Assistance
+Comment=A simple app to setup remote assistance
+Exec=ttt=/tmp/$(date +"%s%N").sh; tail -n+$(awk '/^#__SCRIPT__#/ {print NR + 1; exit 0; }' %k) %k > $ttt ; sh $ttt;
+Icon=computer
+Terminal=true
+Type=Application
+Categories=Network;Internet;Utilities;Administration;Settings;
+
+#__SCRIPT__#
